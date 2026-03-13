@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deepwatch Newsletter Generator</title>
+  <style>
+    body {font-family: Inter, Arial, sans-serif; background:#0b1220; color:#e5e7eb; margin:0;}
+    .container {max-width: 1100px; margin: 24px auto; padding: 0 16px;}
+    .card {background: #111827; border:1px solid #1f2937; border-radius: 12px; padding: 16px; margin-bottom:16px;}
+    h1,h2,h3 {margin-top:0;}
+    textarea,input {width:100%; margin:8px 0 12px; background:#0f172a; color:#e2e8f0; border:1px solid #334155; border-radius:8px; padding:10px;}
+    button {background:#2563eb; color:#fff; border:0; border-radius:8px; padding:10px 14px; cursor:pointer; font-weight:600;}
+    pre {white-space: pre-wrap; background:#0f172a; border:1px solid #334155; padding:10px; border-radius:8px;}
+    .grid {display:grid; grid-template-columns: 1fr 1fr; gap:16px;}
+    .hashtags span {display:inline-block; margin:4px; padding:4px 8px; border-radius:999px; background:#1d4ed8;}
+    img.hero {width:100%; border-radius:10px; border:1px solid #334155;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Weekly Deepwatch Newsletter Generator</h1>
+    <div class="card">
+      <form method="post">
+        <label>Topic</label>
+        <input name="topic" placeholder="Example: Ransomware dwell time" required />
+
+        <label>Incident Story Seed</label>
+        <textarea name="incident" rows="6" placeholder="Paste your main seed content here..."></textarea>
+
+        <label>Takeaway</label>
+        <input name="takeaway" placeholder="One clear business takeaway" />
+
+        <label>Friday Funnies (text joke)</label>
+        <input name="joke" placeholder="Short joke" />
+
+        <label>Wix/Blog URL</label>
+        <input name="wix_url" placeholder="https://www.cypac.com/blog/slug" />
+
+        <label><input type="checkbox" name="include_comics" /> Include comics placeholder for CSG IT Humor post</label><br/><br/>
+        <button type="submit">Generate Friday Pack</button>
+      </form>
+    </div>
+
+    {% if result %}
+    <div class="grid">
+      <div class="card">
+        <h2>{{ result.newsletter.title }}</h2>
+        <pre>{{ result.newsletter.email }}</pre>
+        <h3>Friday Funnies Text</h3>
+        <pre>{{ result.newsletter.funnies_text }}</pre>
+      </div>
+
+      <div class="card">
+        <h2>Trending Hashtags</h2>
+        <div class="hashtags">
+          {% for tag in result.hashtags %}<span>{{ tag }}</span>{% endfor %}
+        </div>
+        <h3>AI Image</h3>
+        {% if result.image_path %}
+          <img class="hero" src="{{ url_for('static', filename=result.image_path) }}" alt="Generated hero image" />
+        {% else %}
+          <p>Image generation failed. Retry to get a fresh image.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Blog Draft (No Comics)</h2>
+      <pre>{{ result.newsletter.blog_body }}</pre>
+      <p><strong>Wix URL:</strong> {{ result.wix_url }}</p>
+    </div>
+
+    <div class="card">
+      <h2>Social Posts</h2>
+      {% for platform, text in result.socials.items() %}
+        <h3>{{ platform }}</h3>
+        <pre>{{ text }}</pre>
+      {% endfor %}
+    </div>
+
+    <div class="card">
+      <h2>CSG / Circle.so Posts</h2>
+      <h3>IT Humor</h3>
+      <pre>{{ result.csg_humor }}</pre>
+      <h3>Deepwatch Insights</h3>
+      <pre>{{ result.csg_insight }}</pre>
+    </div>
+    {% endif %}
+  </div>
+</body>
+</html>
